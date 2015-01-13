@@ -1,5 +1,5 @@
 % assert(1==0);
-clear all;close all;clc;
+% clear all;close all;clc;
 disp(sprintf('reading and formatting data...'));
 % load('FEATURES-N-v4.mat');
 %  load('FEATURES-NP-v2.mat'); %timit mixture speech
@@ -25,7 +25,9 @@ disp(sprintf('reading and formatting data...'));
 %     load('FEATURES-C2.mat');
 %  load('FEATURES-CELLO-C2.mat');
 %  load('FEATURES-PIANO-C2.mat');
-load('FEATURES-test.mat');
+%load('FEATURES-test.mat');
+%load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
+
 
 Nab=2;
 FEATURESab=cell(Nab,1);
@@ -39,10 +41,13 @@ INFOab=cell(Nab,1);
 INFOab{1}=INFO{A};
 INFOab{2}=INFO{B};
 
-
+if ispc()
 % addpath('C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures\libsvm');
-addpath('C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures\libplsda');
-addpath('C:\Users\user\Dropbox (PPCA)\Research MIT\Sound_Texture_Synthesis_Toolbox');
+addpath(genpath('C:\Users\user\Dropbox (PPCA)\Research MIT\toolboxes'));
+elseif ismac()
+addpath(genpath('~/ResearchMIT/toolboxes/'))
+    
+end
 
 NTRAIN=round(size(FEATURESab{1},1)*9/10);
 
@@ -140,15 +145,20 @@ XpT=valsT;
 ypT=labelsT*2-3;
 
 disp(sprintf('doing cross-validation...'));
+tic
 CV=plscv(Xp,yp,Ap);
+toc
 
 disp(sprintf('doing pls pn all data...'));
+tic
 PLS=pls(Xp,yp,Ap);
 acc=sum(sign(CV.Ypred(:,:))==repmat(yp,1,size(CV.Ypred,2)))/length(yp)
+toc
 disp(sprintf('predict on test set...'));
+tic
 [ypredT]=plsval(PLS,XpT,ypT,Ap);
 accT=sum(sign(ypredT)==ypT)/length(ypT);
-
+toc
 %%
 disp(sprintf('displaying data projected to sub spaces...'));
 figure(50);clf;
@@ -167,6 +177,13 @@ for I=1:NTS,
         ylabel(sprintf('%d',I));
     end
 end
+figure(51);clf;
+
+hold on;I1=1;I2=2;
+pos=(labels~=1);plot(PLS.X_scores(pos,I1),PLS.X_scores(pos,I2),'.r');
+pos=(labels==1);plot(PLS.X_scores(pos,I1),PLS.X_scores(pos,I2),'.b');
+
+[val,idx]=sort(PLS.X_scores(:,I1));
 
 %%
 
@@ -178,7 +195,6 @@ for I=1:32,
     cmp(I,:)=[1-I/32,0,0];
     
 end
-figure(170);clf;figure(18);clf;
 for I=1:min(15,Ap),
     figure(170+I);
 %     subplot(4,4,I);
@@ -214,7 +230,7 @@ end
 % title('Labeling accuracy');
 % xlabel('Number of coefficents');
 
-figure(18);
+figure(18);clf;
 ylabel('Accuracy (%%)');
 h=legend('cv-train','all-test','Location','NorthEastOutside');
 set(h,'FontSize',8);
@@ -250,7 +266,6 @@ for J=1:length(WHO),
 %         nori_log_imagesc(xlgnd,ylgnd, (reshape(vals(idx(I),:),[length(ylgnd),length(xlgnd)]))',[]);axis xy;
 %         data=nori_cell_array_unvectorize(info{idx(idx(I))}.jstats.data,vecformat);is_colormap_negative=false;
         nori_figure_stat_summary_as_cell_array(info{idx(I)}.jstats.data,xleg,yleg,xlabels,ylabels,titles,[],[]);
-     
         
 %         set(gca,'Xtick',xlgnd(1:4:end));
 %         set(gca,'XtickLabel',round(xlgnd(1:4:end)));
@@ -261,13 +276,6 @@ end
 
 %%
 
-figure(22);clf;
-
-hold on;I1=1;I2=2;
-pos=(labels~=1);plot(PLS.X_scores(pos,I1),PLS.X_scores(pos,I2),'.r');
-pos=(labels==1);plot(PLS.X_scores(pos,I1),PLS.X_scores(pos,I2),'.b');
-
-[val,idx]=sort(PLS.X_scores(:,I1));
 
 
 
@@ -279,8 +287,8 @@ figure(2);clf;
 hold on;
 WHO=[1:Ap]
 % WHO=[4]
-MAXSOUNDS=5;
-Nplay=5;
+MAXSOUNDS=15;
+Nplay=10;
 for I1=WHO,
     % I1=6;
     % I2=1;
@@ -289,8 +297,8 @@ for I1=WHO,
     % pos=(labels==1);plot(PLS.X_scores(pos,I1),PLS.X_scores(pos,I2),'.b');
     
     [val,idx]=sort(PLS.X_scores(:,I1));
-    Nplay=400;
-    RANGES={[1:Nplay],[length(idx):-1:(length(idx)-Nplay)]};
+    Nplay=400;Njump=1;
+    RANGES={[1:Njump:Nplay],[length(idx):-Njump:(length(idx)-Nplay)]};
     
     for k=1:length(RANGES),
         %     if k==1
@@ -300,7 +308,6 @@ for I1=WHO,
         %     end
         playme=zeros(fs,1);
         
-        figure(100+k);clf
         cnt=1;
         hashy=inf;
         MYHASHES=[];
@@ -308,12 +315,16 @@ for I1=WHO,
             if cnt>MAXSOUNDS;
                 break
             end
-            if sum(vals(idx(J),:))~=hashy
+            hashy=sum(double(info{idx(I)}.fname));
+            if isempty(find(MYHASHES==hashy, 1));
 %                 subplot(floor(sqrt(MAXSOUNDS)+0.5),floor(sqrt(MAXSOUNDS)+0.5),min(cnt,MAXSOUNDS)); 
-                cnt=cnt+1;
-                hashy= sum(vals(idx(J),:));
-                nori_figure_stat_summary_as_cell_array(info{idx(idx(J))}.jstats.data,xleg,yleg,xlabels,ylabels,titles,[],[]);
+                cnt=cnt+1;NYHASHES=[MYHASHES,hashy];
+                %hashy= sum(vals(idx(J),:));
+                %nori_figure_stat_summary_as_cell_array(info{idx(idx(J))}.jstats.data,xleg,yleg,xlabels,ylabels,titles,[],[]);
+                figure(1000+cnt+100*k);clf
+                nori_figure_stat_summary_as_cell_array(info{idx(J)}.jstats.data,xleg,yleg,xlabels,ylabels,titles,[],[]);
                 
+    
 %                 nori_log_imagesc(xlgnd,ylgnd,reshape(vals(idx(J),:),[length(ylgnd),length(xlgnd)]),[]);axis xy;
 %                 axis xy;
 %                 axis off;
