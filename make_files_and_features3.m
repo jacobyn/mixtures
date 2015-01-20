@@ -5,7 +5,7 @@ Ms=[1:2]; %all possible number of speakers
 
 
 addpath(genpath('~/toolboxes/'))
-base_corpus='~/sounds/timit-train/';
+base_corpus='~/data/sounds/timit-train/';
 base_ptrn='s*.wav';
 output_audiodata='~/data/mixture-temp';
 feature_fname='~/data/mixture-res/FEATURES-timit-10k.mat'
