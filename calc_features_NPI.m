@@ -1,5 +1,5 @@
 % compute features
-cd 'C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures'
+%cd 'C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures'
 close all;clc;clear all;
 NFB=150;
 Ms=[2];
@@ -76,16 +76,21 @@ for m=1:MN,
         Cgrm1=zeros(size(Cgrm));Cgrm1(:,pos1)=Cgrm(:,pos1);
         Cgrm2=zeros(size(Cgrm));Cgrm2(:,pos2)=Cgrm(:,pos2);
         
+        
         %If you want to generate a time series from a Cochleagram use
         Y1=0.5*collapse_subbands(Cgrm1,FilterBank);
         Y2=0.5*collapse_subbands(Cgrm2,FilterBank);
         drawnow;
+        
+        for tt=1:2,
+        
         p = audioplayer(0.1*ts, fs);p.play
         pause(1);
         p1 = audioplayer(0.1*Y1, fs);p1.play
         pause(1);
         p2 = audioplayer(0.1*Y2, fs);p2.play
         pause(1);
+        end
         
         
         subplot(2,3,6);

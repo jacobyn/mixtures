@@ -1,5 +1,5 @@
 % assert(1==0);
-% clear all;close all;clc;
+clear all;close all;clc;
 disp(sprintf('reading and formatting data...'));
 % load('FEATURES-N-v4.mat');
 %  load('FEATURES-NP-v2.mat'); %timit mixture speech
@@ -26,7 +26,9 @@ disp(sprintf('reading and formatting data...'));
 %  load('FEATURES-CELLO-C2.mat');
 %  load('FEATURES-PIANO-C2.mat');
 %load('FEATURES-test.mat');
+
 %load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
+load('FEATURES-cello-10k.mat');
 
 
 Nab=2;
@@ -259,7 +261,7 @@ for J=1:length(WHO),
     MAXSOUNDS=5;
     disp(sprintf('displaying examples of stimuli'));
     for I=1:MAXSOUNDS,
-        figure(J*1000+I);
+        figure(J*10000+I);
 %         subplot(floor(sqrt(MAXSOUNDS)+0.5),floor(sqrt(MAXSOUNDS)+0.5),I)
         idx=find(labels==WHO(J));
         
@@ -289,6 +291,7 @@ WHO=[1:Ap]
 % WHO=[4]
 MAXSOUNDS=15;
 Nplay=10;
+NSHOW=3;
 for I1=WHO,
     % I1=6;
     % I2=1;
@@ -321,9 +324,10 @@ for I1=WHO,
                 cnt=cnt+1;NYHASHES=[MYHASHES,hashy];
                 %hashy= sum(vals(idx(J),:));
                 %nori_figure_stat_summary_as_cell_array(info{idx(idx(J))}.jstats.data,xleg,yleg,xlabels,ylabels,titles,[],[]);
-                figure(1000+cnt+100*k);clf
-                nori_figure_stat_summary_as_cell_array(info{idx(J)}.jstats.data,xleg,yleg,xlabels,ylabels,titles,[],[]);
-                
+                if cnt<NSHOW
+                 figure(1000+cnt+100*k);clf
+                  nori_figure_stat_summary_as_cell_array(info{idx(J)}.jstats.data,xleg,yleg,xlabels,ylabels,titles,[],[]);
+                end
     
 %                 nori_log_imagesc(xlgnd,ylgnd,reshape(vals(idx(J),:),[length(ylgnd),length(xlgnd)]),[]);axis xy;
 %                 axis xy;
@@ -364,7 +368,7 @@ for I1=WHO,
         
         drawnow;
         p=audioplayer(playme,fs);p.play;
-        ofname=sprintf('NPLS-concat-d-%d.direc-%d.wav',I1,k);
+        ofname=sprintf('NPLS-10kCELLO-concat-d-%d.direc-%d.wav',I1,k);
         
         audiowrite(ofname,playme,fs)
         pause(0.8*length(playme)/fs);
