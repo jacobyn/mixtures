@@ -1,14 +1,23 @@
-%matlabpool
+%matlabpoolv
 clear all;close all;clc;
-ITER=100; % number of random
+ITER=10000; % number of random
 Ms=[1:2]; %all possible number of speakers
 
 
 addpath(genpath('~/toolboxes/'))
-base_corpus='~/data/audio-insts/';
-base_ptrn='cello*wav';
+base_corpus='~/sounds/timit-train/';
+base_ptrn='s*.wav';
 output_audiodata='~/data/mixture-temp';
-feature_fname='~/data/mixture-res/FEATURES-test.mat'
+feature_fname='~/data/mixture-res/FEATURES-timit-10k.mat'
+
+
+% addpath(genpath('~/toolboxes/'))
+% base_corpus='~/data/audio-insts/';
+% base_ptrn='cello*wav';
+% output_audiodata='~/data/mixture-temp';
+% feature_fname='~/data/mixture-res/FEATURES-cello-10k.mat'
+
+
 
 
 %     base_ptrn='*.wav';
@@ -16,7 +25,7 @@ feature_fname='~/data/mixture-res/FEATURES-test.mat'
 %     feature_fname='C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures\FEATURES-TEMP.mat';
 
 % for mac:   addpath(genpath('~/ResearchMIT/toolboxes/'))
-    
+
 % if isunix
 %     base_corpus='~/mcdermott/shared/Audiobooks';
 %     base_ptrn='En*.wav';
@@ -26,7 +35,7 @@ feature_fname='~/data/mixture-res/FEATURES-test.mat'
 %     output_audiodata='~/mixtures/data/audiobooksall';
 %     % feature_fname='~/mixtures/FEATURES-AUDIO-BOOKS-HUN.mat';
 %     feature_fname='~/mixtures/FEATURES-ALLJSTATS-ENGLISH.mat'
-%     
+%
 %     addpath('~/Sound_Texture_Synthesis_Toolbox');
 %     addpath('~/mixtures/');
 % else
@@ -36,7 +45,7 @@ feature_fname='~/data/mixture-res/FEATURES-test.mat'
 %     feature_fname='C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures\FEATURES-TEMP.mat';
 %     addpath('C:\Users\user\Dropbox (PPCA)\Research MIT\Sound_Texture_Synthesis_Toolbox');
 %     addpath('C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures\');
-%     
+%
 % end
 
 NFEAT=640;  % for modpower
@@ -64,13 +73,20 @@ NF=length(files);
 rmss=nan(VOLUMEITER,1);
 
 for KK=1:VOLUMEITER,
-    tiD=randi(NF,1,1);
+    tsmpls=0;tfs=0;
+    while (tsmpls-tfs*DUR)<=0
+        tiD=randi(NF,1,1);
+        
+        tfname=files(tiD).name;
+        tinfo=audioinfo(tfname);
+        tsmpls=tinfo.TotalSamples;
+        tfs=tinfo.SampleRate;
+        if (tsmpls-tfs*DUR)<0
+            fprintf('filename %s too short (%g sec)\n', tfname,tsmpls/tfs)
+        end
+        
+    end
     
-    tfname=files(tiD).name;
-    tinfo=audioinfo(tfname);
-    tsmpls=tinfo.TotalSamples;
-    tfs=tinfo.SampleRate;
-    assert(tsmpls-tfs*DUR>0);
     tmypos=randi(tsmpls-tfs*DUR,1,1);
     tmyrange=[tmypos, tmypos+tfs*DUR];
     
@@ -108,12 +124,20 @@ for mm=1:length(Ms),
             
             myrms=0;
             while myrms<MYTHRESH
-                iD=randi(NF,1,1);
-                fname=files(iD).name;
-                info=audioinfo(fname);
-                smpls=info.TotalSamples;
-                fs=info.SampleRate;
-                assert(smpls-fs*DUR>0);
+                
+                smpls=0;fs=0;
+                while (smpls-fs*DUR)<=0
+                    iD=randi(NF,1,1);
+                    
+                    fname=files(tiD).name;
+                    info=audioinfo(tfname);
+                    smpls=tinfo.TotalSamples;
+                    fs=tinfo.SampleRate;
+                    if (smpls-fs*DUR)<0
+                        fprintf('filename %s too short (%g sec)\n', tfname,tsmpls/tfs)
+                    end
+                    
+                end
                 mypos=randi(smpls-fs*DUR,1,1);
                 myrange=[mypos, mypos+fs*DUR];
                 if myrms>0
@@ -158,7 +182,7 @@ for mm=1:length(Ms),
 end
 toc
 %%
-fprintf('makinmg feature\n');
+fprintf('making feature\n');
 tic
 MN=length(Ms);
 FEATURES=cell(MN,1);
@@ -177,7 +201,7 @@ for m=1:MN,
     clear Y;
     clear FS;
     fnames=dir(sprintf('*.M.%d.*',m));
-    parfor (KK=1:ITER),
+    parfor (KK=1:ITER)
         mfname=sprintf('%s',fnames(KK).name);
         display(sprintf('%s',mfname));
         
@@ -209,10 +233,10 @@ for m=1:MN,
         %         myINFO{KK,1}.ylgnd_name='Coch. Channel (Hz)[C]';
         
         %feature=reshape([S.mod_C2(:,:,1),S.mod_C2(:,:,2)],[1 32*6*2]); % rehshape stats
-%         myINFO{KK,1}.xlgnd=1:12;
-%         myINFO{KK,1}.ylgnd=S.audio_cutoffs_Hz;
-%         myINFO{KK,1}.xlgnd_name='Modulation Channel (#real),(#imag) ';
-%         myINFO{KK,1}.ylgnd_name='Coch. Channel (Hz)[C]';
+        %         myINFO{KK,1}.xlgnd=1:12;
+        %         myINFO{KK,1}.ylgnd=S.audio_cutoffs_Hz;
+        %         myINFO{KK,1}.xlgnd_name='Modulation Channel (#real),(#imag) ';
+        %         myINFO{KK,1}.ylgnd_name='Coch. Channel (Hz)[C]';
         feature= jstats.vec;
         myINFO{KK,1}.jstats=jstats;
         
@@ -245,7 +269,12 @@ for m=1:MN,
     INFO{m}=myINFO;
 end
 toc
+tic
+fprintf('start saving to %s\n',feature_fname)
 save(feature_fname,'-v7.3');
+fprintf('end saving \n');
+toc
 if is_show_snap
     figure(1);clf;imagesc([FEATURES{2};FEATURES{1}]);axis xy
 end
+fprintf('DONE!');
