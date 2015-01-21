@@ -8,7 +8,7 @@ addpath(genpath('~/toolboxes/'))
 base_corpus='~/data/sounds/timit-train/';
 base_ptrn='s*.wav';
 output_audiodata='~/data/mixture-temp';
-feature_fname='~/data/mixture-res/FEATURES-timit-10k.mat'
+feature_fname='~/data/mixture-res/FEATURES-timit-OK-10k.mat'
 
 
 % addpath(genpath('~/toolboxes/'))
@@ -129,10 +129,10 @@ for mm=1:length(Ms),
                 while (smpls-fs*DUR)<=0
                     iD=randi(NF,1,1);
                     
-                    fname=files(tiD).name;
-                    info=audioinfo(tfname);
-                    smpls=tinfo.TotalSamples;
-                    fs=tinfo.SampleRate;
+                    fname=files(iD).name;
+                    info=audioinfo(fname);
+                    smpls=info.TotalSamples;
+                    fs=info.SampleRate;
                     if (smpls-fs*DUR)<0
                         fprintf('filename %s too short (%g sec)\n', tfname,tsmpls/tfs)
                     end
