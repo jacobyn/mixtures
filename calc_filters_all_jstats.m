@@ -28,7 +28,9 @@ disp(sprintf('reading and formatting data...'));
 %load('FEATURES-test.mat');
 
 %load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
-load('FEATURES-cello-10k.mat');
+%load('FEATURES-cello-10k.mat');
+load('FEATURES-timit-10kb.mat');
+
 
 
 Nab=2;
