@@ -159,10 +159,10 @@ for mm=1:length(Ms),
             %             lengthR=length(R)/FS0;
             %             mixme{I}=0.03*(R/sqrt(mean((R.^2))));
             
+            Y=double(Y);
+            Y=0.03*(Y/sqrt(mean((Y.^2))));
             
             mixme{I}=resample(double(Y),FS0,FS);
-            
-            
             mynames{I}=fname;
         end
         mlength=DUR;
@@ -170,8 +170,7 @@ for mm=1:length(Ms),
         for I=1:M,
             soundM(1:round(FS0*mlength))=soundM(1:round(FS0*mlength))+ mixme{I}(1:round(FS0*mlength));
         end
-        %         soundM=0.03*(soundM/sqrt(mean((soundM.2))));
-        %soundM=0.03*soundM;
+      
         soundM=0.03*(soundM/sqrt(mean((soundM.^2))));
         mfname=sprintf('mix-v1.M.%d.%d.wav',M,KK);
         
