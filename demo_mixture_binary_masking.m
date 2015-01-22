@@ -7,7 +7,7 @@ addpath(genpath('~/ResearchMIT/toolboxes'));
 base_corpus='~/ResearchMIT/mixtures/timit-train';
 output_data='~/ResearchMIT/mixtures/sound-examples';
 LF=40;HF=8000;NFB=150;
-
+DUR=150/1000; %100ms
 FS0=16000;
 
 disp('reading corpus...');
@@ -15,7 +15,8 @@ cd (base_corpus);
 files=dir('s*.wav');
 %%
 NF=length(files);
-
+DATA=cell(ITER,1);
+cnt=0;
 for mm=1:length(Ms),
     M=Ms(mm);
     
@@ -32,14 +33,14 @@ for mm=1:length(Ms),
             iD=randi(NF,1,1);
             
             fname=files(iD).name;
-            %             info=audioinfo(fname);
-            %             smpls=info.TotalSamples;
-            %             fs=info.SampleRate;
-            %             assert(smpls-fs*DUR>0);
-            %             mypos=randi(smpls-fs*DUR,1,1);
-            %             myrange=[mypos, mypos+fs*DUR];
+            info=audioinfo(fname);
+            smpls=info.TotalSamples;
+            fs=info.SampleRate;
+           assert(smpls-fs*DUR>0);
+            mypos=randi(smpls-fs*DUR,1,1);
+            myrange=[mypos, mypos+fs*DUR];
             
-            [Y, FS]=audioread(fname);
+            [Y, FS]=audioread(fname,myrange);
             
             %         [Y,FS,NBITS,CHUNKDATA] = aiffread(fname,[BEG*44100,(BEG+1)*44100]);%             [Y,FS,NBITS,CHUNKDATA] = aiffread(fname);
             
@@ -71,6 +72,14 @@ for mm=1:length(Ms),
         maskM=(myCgrm{1}.^2)>(myCgrm{2}.^2);
         Y1=collapse_subbands(myCgrmM.*(maskM==0),FilterBank);
         Y2=collapse_subbands(myCgrmM.*(maskM==1),FilterBank);
+        
+        cnt=cnt+1;
+        DATA{cnt}.y1=myCgrm{1};
+        DATA{cnt}.y2=myCgrm{2};
+        DATA{cnt}.mask=maskM;
+        DATA{cnt}.mixture=myCgrmM;
+        assert(numel(DATA{cnt}.y1)==numel(DATA{cnt}.y2));assert(numel(DATA{cnt}.y1)==numel(DATA{cnt}.mask));assert(numel(DATA{cnt}.mask)==numel(DATA{cnt}.mixture));
+        
     
         
         figure(1);
@@ -83,18 +92,16 @@ for mm=1:length(Ms),
         subplot(3,2,6);imagesc(log((myCgrm{2}.*(maskM==1)).^2 )');axis xy;title('masked mixture 2');
        
         p = audioplayer(soundM, FS);p.play
-        pause(1.5*length(soundM)/FS);
+        pause(1.5*length(soundM)/FS +0.5);
         %          p = audioplayer(mixme{1}, FS);p.play
         %          pause(1.1*length(mixme{1})/FS);
         %          p = audioplayer(mixme{2}, FS);p.play
         %          pause(1.1*length(mixme{2})/FS);
         
-        
-        
         p1 = audioplayer(Y1, FS);p1.play
-        pause(1.1*length(Y1)/FS);
+        pause(1.1*length(Y1)/FS +0.5);
         p2 = audioplayer(Y2, FS);p2.play
-        pause(1.1*length(Y2)/FS);
+        pause(1.1*length(Y2)/FS+ 0.5);
         
         
        cd (output_data);

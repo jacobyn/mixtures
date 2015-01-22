@@ -1,5 +1,5 @@
 % assert(1==0);
-clear all;close all;clc;
+%clear all;close all;clc;
 disp(sprintf('reading and formatting data...'));
 % load('FEATURES-N-v4.mat');
 %  load('FEATURES-NP-v2.mat'); %timit mixture speech
@@ -28,7 +28,7 @@ disp(sprintf('reading and formatting data...'));
 %load('FEATURES-test.mat');
 tic
 %load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
-load('FEATURES-timit-10k.mat');
+%load('FEATURES-timit-OK-10k.mat');
 
 %load('FEATURES-cello-10k.mat');
 toc
@@ -233,10 +233,10 @@ for I=1:min(15,Ap),
    
 %     nori_log_imagesc(xlgnd,ylgnd,wfr,[])
      data=nori_cell_array_unvectorize(wf,vecformat);is_colormap_negative=true;
-     clim=[-max(abs(wf)),max(abs(wf))];
-     %clim=[-1,1];
+%     %clim=[-max(abs(wf)),max(abs(wf))];
+ %    clim=[-1,1];
      % clim=[];
-%      clim=[-sqrt(mean(wf.*wf)),sqrt(mean(wf.*wf))];
+      clim=[-5*sqrt(mean(wf.*wf)),5*sqrt(mean(wf.*wf))];
      nori_figure_stat_summary_as_cell_array(data,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim)
      
      
@@ -392,7 +392,7 @@ for I1=WHO,
         
         drawnow;
         p=audioplayer(playme,fs);p.play;
-        ofname=sprintf('NLIN-10kCELLO-concat-d-%d.direc-%d.wav',I1,k);
+        ofname=sprintf('NLIN-10ktimit-concat-d-%d.direc-%d.wav',I1,k);
         
         audiowrite(ofname,playme,fs)
         pause(0.8*length(playme)/fs);

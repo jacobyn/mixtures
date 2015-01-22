@@ -1,5 +1,5 @@
 % assert(1==0);
-clear all;close all;clc;
+%clear all;close all;clc;
 disp(sprintf('reading and formatting data...'));
 % load('FEATURES-N-v4.mat');
 %  load('FEATURES-NP-v2.mat'); %timit mixture speech
@@ -28,7 +28,7 @@ disp(sprintf('reading and formatting data...'));
 %load('FEATURES-test.mat');
 tic
 %load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
-load('FEATURES-timit-10kb.mat');
+%load('FEATURES-timit-10kb.mat');
 
 %load('FEATURES-cello-10k.mat');
 toc
@@ -46,6 +46,8 @@ INFOab=cell(Nab,1);
 INFOab{1}=INFO{A};
 INFOab{2}=INFO{B};
 LNA=1;LNB=2144;
+LNA=1;LNB=32;
+
 LN_RANGE=LNA:LNB;
 %LN_RANGE=1:8288;
 
@@ -88,13 +90,20 @@ for I=1:Nab
         if isfield(INFOab{I}{J},'jstats')
             info{cnt,1}.jstats=INFOab{I}{J}.jstats;
             vecformat=INFOab{I}{J}.jstats.vecformat;
-            vecformat={vecformat{1},vecformat{2},vecformat{3},vecformat{4},vecformat{5},vecformat{6}}; %RANGE LIMIT
+            
+            
+            
             xleg=INFOab{I}{J}.jstats.xleg;
             yleg=INFOab{I}{J}.jstats.yleg;
             xlabels=INFOab{I}{J}.jstats.xlabels;
             ylabels=INFOab{I}{J}.jstats.ylabels;
             titles=INFOab{I}{J}.jstats.titles;
             
+            vecformat={vecformat{1},vecformat{2},vecformat{3},vecformat{4},vecformat{5},vecformat{6}}; %RANGE LIMIT
+            vecformat={vecformat{1}}; %RANGE LIMIT
+            xlabels={xlabels{1}};
+            ylabels={ylabels{1}};
+            titltes={titles{1}};
         end
         
             
@@ -237,10 +246,10 @@ for I=1:min(15,Ap),
    
 %     nori_log_imagesc(xlgnd,ylgnd,wfr,[])
      data=nori_cell_array_unvectorize(wf,vecformat);is_colormap_negative=true;
-     clim=[-max(abs(wf)),max(abs(wf))];
+%     clim=[-max(abs(wf)),max(abs(wf))];
      %clim=[-1,1];
      % clim=[];
-%      clim=[-sqrt(mean(wf.*wf)),sqrt(mean(wf.*wf))];
+     clim=[-5*sqrt(mean(wf.*wf)),5*sqrt(mean(wf.*wf))];
      nori_figure_stat_summary_as_cell_array(data,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim)
      
      
@@ -296,7 +305,7 @@ for J=1:length(WHO),
         
 %         nori_log_imagesc(xlgnd,ylgnd, (reshape(vals(idx(I),:),[length(ylgnd),length(xlgnd)]))',[]);axis xy;
 %         data=nori_cell_array_unvectorize(info{idx(idx(I))}.jstats.data,vecformat);is_colormap_negative=false;
-        nori_figure_stat_summary_as_cell_array(info{idx(I)}.jstats.data,xleg,yleg,xlabels,ylabels,titles,[],[]);
+        nori_figure_stat_summary_as_cell_array(info{idx(I)}.jstats.data,info{idx(I)}.jstats.xleg,info{idx(I)}.jstats.yleg,info{idx(I)}.jstats.xlabels,info{idx(I)}.jstats.ylabels,info{idx(I)}.jstats.titles,[],[]);
         
 %         set(gca,'Xtick',xlgnd(1:4:end));
 %         set(gca,'XtickLabel',round(xlgnd(1:4:end)));

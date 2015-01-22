@@ -1,5 +1,5 @@
 % assert(1==0);
-clear all;close all;clc;
+%clear all;close all;clc;
 disp(sprintf('reading and formatting data...'));
 % load('FEATURES-N-v4.mat');
 %  load('FEATURES-NP-v2.mat'); %timit mixture speech
@@ -29,7 +29,7 @@ disp(sprintf('reading and formatting data...'));
 
 %load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
 %load('FEATURES-cello-10k.mat');
-load('FEATURES-timit-10kb.mat');
+%load('FEATURES-timit-10kb.mat');
 
 
 

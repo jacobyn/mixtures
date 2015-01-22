@@ -1,6 +1,6 @@
 %matlabpoolv
 clear all;close all;clc;
-ITER=10000; % number of random
+ITER=10; % number of random
 Ms=[1:2]; %all possible number of speakers
 
 
@@ -8,7 +8,7 @@ addpath(genpath('~/toolboxes/'))
 base_corpus='~/data/sounds/timit-train/';
 base_ptrn='s*.wav';
 output_audiodata='~/data/mixture-temp';
-feature_fname='~/data/mixture-res/FEATURES-timit-OK-10k.mat'
+feature_fname='~/data/mixture-res/FEATURES-timit-norm-10k.mat'
 
 
 % addpath(genpath('~/toolboxes/'))
@@ -159,6 +159,7 @@ for mm=1:length(Ms),
             %             lengthR=length(R)/FS0;
             %             mixme{I}=0.03*(R/sqrt(mean((R.^2))));
             
+            
             mixme{I}=resample(double(Y),FS0,FS);
             
             
@@ -170,7 +171,8 @@ for mm=1:length(Ms),
             soundM(1:round(FS0*mlength))=soundM(1:round(FS0*mlength))+ mixme{I}(1:round(FS0*mlength));
         end
         %         soundM=0.03*(soundM/sqrt(mean((soundM.2))));
-        soundM=0.03*soundM;
+        %soundM=0.03*soundM;
+        soundM=0.03*(soundM/sqrt(mean((soundM.^2))));
         mfname=sprintf('mix-v1.M.%d.%d.wav',M,KK);
         
         
