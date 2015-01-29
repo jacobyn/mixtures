@@ -7,12 +7,14 @@ addpath(genpath('~/ResearchMIT/toolboxes'));
 base_corpus='~/ResearchMIT/mixtures/timit-train';
 output_data='~/ResearchMIT/mixtures/sound-examples';
 LF=40;HF=8000;NFB=150;
-DUR=150/1000; %100ms
+DUR=1500/1000; %100ms
 FS0=16000;
 
 disp('reading corpus...');
 cd (base_corpus);
 files=dir('s*.wav');
+
+MYRMS=15 % rms of the mixture!!! important
 %%
 NF=length(files);
 DATA=cell(ITER,1);
@@ -53,6 +55,7 @@ for mm=1:length(Ms),
             mlength=min(mlength,lengthR);
             mynames{I}=fname;
         end
+        mixme{I}=mixme{I}*(10^(-MYRMS*(I-1)/20)); %note we make sounds uneven!
         
         soundM=zeros(round(FS0*mlength),1);
         for I=1:M,
@@ -69,9 +72,14 @@ for mm=1:length(Ms),
         end
         
         assert(M==2);
-        maskM=(myCgrm{1}.^2)>(myCgrm{2}.^2);
+        maskM=(myCgrm{1}.^2)<((10^(MYRMS/20))*(myCgrm{2}.^2));
+        %maskM=(myCgrm{1}.^2)<((myCgrm{2}.^2));
         Y1=collapse_subbands(myCgrmM.*(maskM==0),FilterBank);
         Y2=collapse_subbands(myCgrmM.*(maskM==1),FilterBank);
+        
+        Y1=0.03*Y1/rms(Y1);
+        Y2=0.03*Y2/rms(Y2);
+        
         
         cnt=cnt+1;
         DATA{cnt}.y1=myCgrm{1};

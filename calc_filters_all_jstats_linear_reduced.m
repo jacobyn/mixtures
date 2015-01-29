@@ -29,7 +29,8 @@ disp(sprintf('reading and formatting data...'));
 tic
 %load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
 %load('FEATURES-timit-10kb.mat');
-
+%load('FEATURES-timit-norm-10k.mat');
+load('~/data/mixture-res/FEATURES-timit-jstat-RMS15-10k.mat');
 %load('FEATURES-cello-10k.mat');
 toc
 fprintf('formatting...\n');
@@ -46,7 +47,7 @@ INFOab=cell(Nab,1);
 INFOab{1}=INFO{A};
 INFOab{2}=INFO{B};
 LNA=1;LNB=2144;
-LNA=1;LNB=32;
+%LNA=1;LNB=32;
 
 LN_RANGE=LNA:LNB;
 %LN_RANGE=1:8288;
@@ -100,10 +101,10 @@ for I=1:Nab
             titles=INFOab{I}{J}.jstats.titles;
             
             vecformat={vecformat{1},vecformat{2},vecformat{3},vecformat{4},vecformat{5},vecformat{6}}; %RANGE LIMIT
-            vecformat={vecformat{1}}; %RANGE LIMIT
-            xlabels={xlabels{1}};
-            ylabels={ylabels{1}};
-            titltes={titles{1}};
+            %vecformat={vecformat{1}}; %RANGE LIMIT
+%             xlabels={xlabels{1}};
+%             ylabels={ylabels{1}};
+%             titltes={titles{1}};
         end
         
             
@@ -190,7 +191,7 @@ toc
 
 disp(sprintf('predict on test set...'));
 tic
-prdcT = predict(obj,valsT);
+[prdcT,scoreT] = predict(obj,valsT);
 accT=sum(prdcT==labelsT)/length(labelsT);
 
 % [ypredT]=plsval(PLS,XpT,ypT,Ap);
@@ -257,7 +258,7 @@ for I=1:min(15,Ap),
     colormap(cmp)
     xlabel(xlgnd_name);
     ylabel(ylgnd_name);
-    title(sprintf('%d',I));
+    %title(sprintf('%d',I));
     
 end
 

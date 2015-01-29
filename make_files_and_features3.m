@@ -1,14 +1,16 @@
 %matlabpoolv
 clear all;close all;clc;
-ITER=10; % number of random
+ITER=10000; % number of random
 Ms=[1:2]; %all possible number of speakers
 
 
 addpath(genpath('~/toolboxes/'))
-base_corpus='~/data/sounds/timit-train/';
+base_corpus='~/ResearchMIT/mixtures/timit-train/';
 base_ptrn='s*.wav';
 output_audiodata='~/data/mixture-temp';
-feature_fname='~/data/mixture-res/FEATURES-timit-norm-10k.mat'
+feature_fname='~/data/mixture-res/FEATURES-timit-jstat-RMS15-10k.mat';
+
+MYRMS=15; % rms of the mixture!!! important
 
 
 % addpath(genpath('~/toolboxes/'))
@@ -16,9 +18,6 @@ feature_fname='~/data/mixture-res/FEATURES-timit-norm-10k.mat'
 % base_ptrn='cello*wav';
 % output_audiodata='~/data/mixture-temp';
 % feature_fname='~/data/mixture-res/FEATURES-cello-10k.mat'
-
-
-
 
 %     base_ptrn='*.wav';
 %     output_audiodata='C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures\data-books';
@@ -48,10 +47,13 @@ feature_fname='~/data/mixture-res/FEATURES-timit-norm-10k.mat'
 %
 % end
 
-NFEAT=640;  % for modpower
-NFEAT=1024;   %for C1 and C
-NFEAT=32*6*2; % for C2 (384)
-NFEAT=8288; %for all stat features
+%NFEAT=640;  % for modpower
+
+% NFEAT=1024;   %for C1 and C
+% NFEAT=32*6*2; % for C2 (384)
+ NFEAT=8288; %for all stat features
+%NFEAT=32;  % for env_mean
+
 
 is_show_snap=false; %for debuging showing snapshots
 %  is_show_snap=true; %for debuging showing snapshots
@@ -151,18 +153,15 @@ for mm=1:length(Ms),
                 myrms=sqrt(mean(Y.^2));
                 
             end
-            %%% note note! no normalization
-            %             Y=double(Y);
-            %             Y=Y/max(Y);
-            %             Y=0.03*(Y/sqrt(mean((Y.^2))));
-            %             R=resample(Y,FS0,FS);
-            %             lengthR=length(R)/FS0;
-            %             mixme{I}=0.03*(R/sqrt(mean((R.^2))));
             
             Y=double(Y);
             Y=0.03*(Y/sqrt(mean((Y.^2))));
             
             mixme{I}=resample(double(Y),FS0,FS);
+            mixme{I}=0.03*mixme{I}/sqrt(mean(mixme{I}.^2));
+            
+            mixme{I}=mixme{I}*(10^(-MYRMS*(I-1)/20)); %note we make sounds uneven!
+            
             mynames{I}=fname;
         end
         mlength=DUR;
@@ -170,7 +169,7 @@ for mm=1:length(Ms),
         for I=1:M,
             soundM(1:round(FS0*mlength))=soundM(1:round(FS0*mlength))+ mixme{I}(1:round(FS0*mlength));
         end
-      
+        
         soundM=0.03*(soundM/sqrt(mean((soundM.^2))));
         mfname=sprintf('mix-v1.M.%d.%d.wav',M,KK);
         
@@ -216,13 +215,21 @@ for m=1:MN,
         [jstats.data,jstats.xleg,jstats.yleg,jstats.xlabels,jstats.ylabels,jstats.titles]=nori_stats_tocellarrays(S);
         [jstats.vec,jstats.vecformat]=nori_cell_array_vectorize(jstats.data);
         
+        feature= jstats.vec;
+        myINFO{KK,1}.jstats=jstats;
         
         
-        %         feature=reshape(S.mod_power,[1 (length(S.Hz_mod_cfreqs)*length(S.audio_cutoffs_Hz))]); % rehshape stats
-        %         myINFO{KK,1}.xlgnd=S.Hz_mod_cfreqs;
-        %         myINFO{KK,1}.ylgnd=S.audio_cutoffs_Hz;
-        %         myINFO{KK,1}.xlgnd_name='mod_fq(Hz)';
-        %         myINFO{KK,1}.ylgnd_name='fq(Hz)';
+%         feature=reshape(S.mod_power,[1 (length(S.Hz_mod_cfreqs)*length(S.audio_cutoffs_Hz))]); % rehshape stats
+%         myINFO{KK,1}.xlgnd=S.Hz_mod_cfreqs;
+%         myINFO{KK,1}.ylgnd=S.audio_cutoffs_Hz;
+%         myINFO{KK,1}.xlgnd_name='mod-fq(Hz)';
+%         myINFO{KK,1}.ylgnd_name='fq(Hz)';
+%         
+        %         feature=S.env_mean;
+        %         myINFO{KK,1}.xlgnd=S.audio_cutoffs_Hz;
+        %         myINFO{KK,1}.ylgnd=[1];
+        %         myINFO{KK,1}.xlgnd_name='fq(Hz)';
+        %         myINFO{KK,1}.ylgnd_name='1';
         %
         %         WC1=6;
         %         feature=reshape(S.mod_C1(:,:,WC1),[1 (length(S.audio_cutoffs_Hz)*length(S.audio_cutoffs_Hz))]); % rehshape stats
@@ -238,8 +245,6 @@ for m=1:MN,
         %         myINFO{KK,1}.ylgnd=S.audio_cutoffs_Hz;
         %         myINFO{KK,1}.xlgnd_name='Modulation Channel (#real),(#imag) ';
         %         myINFO{KK,1}.ylgnd_name='Coch. Channel (Hz)[C]';
-        feature= jstats.vec;
-        myINFO{KK,1}.jstats=jstats;
         
         
         
@@ -260,9 +265,13 @@ for m=1:MN,
         myINFO{KK,1}.Hz_mod_cfreqs=S.Hz_mod_cfreqs;
         myINFO{KK,1}.audio_cutoffs_Hz=S.audio_cutoffs_Hz;
         
-        myINFO{KK,1}.audio=myts;
+        %myINFO{KK,1}.audio=myts;
+        %myINFO{KK,1}.fs=myfs;
         
-        myINFO{KK,1}.fs=myfs;
+        %downsampling
+        myINFO{KK,1}.audio=resample(myts,round(myfs/10),myfs);
+        myINFO{KK,1}.fs=round(myfs/10);
+        
         
         
     end
@@ -275,7 +284,8 @@ fprintf('start saving to %s\n',feature_fname)
 save(feature_fname,'-v7.3');
 fprintf('end saving \n');
 toc
-if is_show_snap
-    figure(1);clf;imagesc([FEATURES{2};FEATURES{1}]);axis xy
-end
+%%
+%if is_show_snap
+figure(1);clf;imagesc([FEATURES{2};FEATURES{1}]);axis xy
+%end
 fprintf('DONE!');
