@@ -5,7 +5,11 @@ Ms=[1:2]; %all possible number of speakers
 
 
 addpath(genpath('~/toolboxes/'))
-base_corpus='~/ResearchMIT/mixtures/timit-train/';
+if ismac
+    base_corpus='~/ResearchMIT/mixtures/timit-train/';
+else
+    base_corpus='~/data/sounds2/timit-train/';
+end    
 base_ptrn='s*.wav';
 output_audiodata='~/data/mixture-temp';
 feature_fname='~/data/mixture-res/FEATURES-timit-jstat-RMS15-10k.mat';
