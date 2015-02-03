@@ -12,7 +12,7 @@ else
 end    
 base_ptrn='s*.wav';
 output_audiodata='~/data/mixture-temp';
-feature_fname='~/data/mixture-res/FEATURES-timit-jstat-RMS15-10k.mat';
+feature_fname='~/data/mixture-res/FEATURES-timit-jstat-RMS15-10kb.mat';
 
 MYRMS=15; % rms of the mixture!!! important
 
