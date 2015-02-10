@@ -31,7 +31,7 @@ fprintf('reading and formatting data...\n');
 %  load('FEATURES-CELLO-C2.mat');
 %  load('FEATURES-PIANO-C2.mat');
 %load('FEATURES-test.mat');
-ticv
+tic
 %load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
 %load('FEATURES-timit-10kb.mat');
 %load('FEATURES-timit-norm-10k.mat');
