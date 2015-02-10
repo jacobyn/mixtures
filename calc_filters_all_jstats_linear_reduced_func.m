@@ -1,4 +1,4 @@
-function calc_filters_all_jstats_linear_reduced_func(LN_RANGE,moutfname)
+function calc_filters_all_jstats_linear_reduced_func(LN_SELECT,moutfname)
 % assert(1==0);
 %clear all;close all;clc;
 %close all
@@ -31,7 +31,7 @@ fprintf('reading and formatting data...\n');
 %  load('FEATURES-CELLO-C2.mat');
 %  load('FEATURES-PIANO-C2.mat');
 %load('FEATURES-test.mat');
-tic
+ticv
 %load('FEATURES-ALLJSTATS-ENGLISH-10k.mat');
 %load('FEATURES-timit-10kb.mat');
 %load('FEATURES-timit-norm-10k.mat');
