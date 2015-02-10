@@ -12,10 +12,10 @@ else
 end    
 base_ptrn='s*.wav';
 output_audiodata='~/data/mixture-temp';
-feature_fname='~/data/mixture-res/FEATURES-timit-jstat-fail80-10kb.mat';
+feature_fname='~/data/mixture-res/FEATURES-timit-jstat-25dc.mat';
 
-MYRMS=15; % rms of the mixture!!! important
-MYRMS=80; % rms of the mixture!!! important
+MYRMS=25; % rms of the mixture!!! important
+%MYRMS=80; % rms of the mixture!!! important
 
 
 % addpath(genpath('~/toolboxes/'))

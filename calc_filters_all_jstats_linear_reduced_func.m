@@ -1,3 +1,4 @@
+function calc_filters_all_jstats_linear_reduced_func(LN_RANGE,moutfname)
 % assert(1==0);
 %clear all;close all;clc;
 %close all
@@ -38,7 +39,7 @@ tic
 %load('FEATURES-cello-10k.mat');
 %%%%%load('~/data/mixture-res/FEATURES-timit-jstat-RMS15-10k.mat');
 %load('~/data/mixture-res/FEATURES-timit-jstat-fail80-10kb.mat');
-%load('~/data/mixture-res/FEATURES-timit-jstat-25db.mat');
+load('~/data/mixture-res/FEATURES-timit-jstat-25db.mat');
 toc
 fprintf('formatting...\n');
 tic
@@ -54,7 +55,7 @@ INFOab=cell(Nab,1);
 INFOab{1}=INFO{A};
 INFOab{2}=INFO{B};
 
-LN_SELECT=[1:12];
+%LN_SELECT=[1:12];
 
 %LNA=1;LNB=2144;
 %LNA=1;LNB=32;
@@ -605,8 +606,8 @@ if DO_EXMP
     end
 end
 toc
-%fprintf('saving\n');
-%clear myFEATURES;clear FEATURES; clear FEATURESab; clear myINFO; clear info; clear INFO; clear INFOab;
-
+fprintf('saving\n');
+clear myFEATURES;clear FEATURES; clear FEATURESab; clear myINFO; clear info; clear INFO; clear INFOab;
+save(moutfname);
 fprintf('DONE!\n');
 %%

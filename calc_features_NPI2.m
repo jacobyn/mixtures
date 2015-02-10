@@ -161,6 +161,10 @@ for m=1:MN,
         p2 = audioplayer(0.1*Y2, fs);p2.play
         pause(1.1*length(ts)/fs);
         pause
+        
+        audiowrite('SPEC-mix.wav',0.1*ts,fs);
+        audiowrite('SPEC-unmix1.wav',0.1*Y1,fs);
+        audiowrite('SPEC-unmix2.wav',0.1*Y2,fs);
         end
         
         

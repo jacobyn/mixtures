@@ -14,7 +14,7 @@ disp('reading corpus...');
 cd (base_corpus);
 files=dir('s*.wav');
 
-MYRMS=15 % rms of the mixture!!! important
+MYRMS=0 % rms of the mixture!!! important
 %%
 NF=length(files);
 DATA=cell(ITER,1);
@@ -114,10 +114,10 @@ for mm=1:length(Ms),
         
        cd (output_data);
        
-        audiowrite('mixture.wav',soundM,FS);
+        audiowrite('talk.wav',mixme{1},FS);
         audiowrite('seperated-1.wav',Y1,FS);
         audiowrite('seperated-2.wav',Y2,FS);
-        
+        audiowrite('seperated-1.wav',Y1,FS);
      
         
     end
