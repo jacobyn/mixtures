@@ -4,6 +4,7 @@ function calc_filters_all_jstats_linear_reduced_func(LN_SELECT,moutfname)
 %close all
 %rng(8000,'twister') % For reproducibility
 
+DO_PLOT=false;
 DO_EXMP=false;
 fprintf('reading and formatting data...\n');
 % load('FEATURES-N-v4.mat');
@@ -250,9 +251,9 @@ Mdl = fitcdiscr(vals,labels,'SaveMemory','on','FillCoeffs','off');
 [err,gamma,delta,numpred] = cvshrink(Mdl,'NumGamma',29,'NumDelta',29,'Verbose',2);
 minerr = min(min(err));
 
- NUM_COEF=round(.3*size(vals,2))
- low_limit = min(min(err(numpred <= NUM_COEF)));
- [p,q] = find(err == low_limit,1);
+NUM_COEF=round(.3*size(vals,2))
+low_limit = min(min(err(numpred <= NUM_COEF)));
+[p,q] = find(err == low_limit,1);
 
 %[p,q] = find(err == minerr,1);
 mygamma= gamma(p);
@@ -272,36 +273,38 @@ tic
 accT=sum(prdcT==labelsT)/length(labelsT);
 toc
 fprintf('acc on train %g acc on test %g\n',acc,accT);
+
 %%
-figure (30);
-indx = repmat(1:size(delta,2),size(delta,1),1);
-subplot(2,2,1)
-imagesc(err);hold on;
-plot(p,q,'ro','MarkerFaceColor','k');
-colorbar;
-colormap('jet')
-title 'Classification error';
-xlabel 'Delta index';
-ylabel 'Gamma index';
-
-subplot(2,2,2)
-imagesc(numpred);hold on;
-plot(p,q,'ro','MarkerFaceColor','k');
-colorbar;
-title 'Number of predictors in the model';
-xlabel 'Delta index' ;
-ylabel 'Gamma index' ;
-
-subplot(2,2,3);
-plot(err,numpred,'k.');hold on;
-plot(err(p,q),numpred(p,q),'ro');
-
-xlabel('Error rate');
-ylabel('Number of predictors');
-subplot(2,2,4);
-b=bar([acc,accT]*100);b(1).FaceColor='blue';
-ylim([50 ,100]);
-
+if DO_PLOT
+    figure (30);
+    indx = repmat(1:size(delta,2),size(delta,1),1);
+    subplot(2,2,1)
+    imagesc(err);hold on;
+    plot(p,q,'ro','MarkerFaceColor','k');
+    colorbar;
+    colormap('jet')
+    title 'Classification error';
+    xlabel 'Delta index';
+    ylabel 'Gamma index';
+    
+    subplot(2,2,2)
+    imagesc(numpred);hold on;
+    plot(p,q,'ro','MarkerFaceColor','k');
+    colorbar;
+    title 'Number of predictors in the model';
+    xlabel 'Delta index' ;
+    ylabel 'Gamma index' ;
+    
+    subplot(2,2,3);
+    plot(err,numpred,'k.');hold on;
+    plot(err(p,q),numpred(p,q),'ro');
+    
+    xlabel('Error rate');
+    ylabel('Number of predictors');
+    subplot(2,2,4);
+    b=bar([acc,accT]*100);b(1).FaceColor='blue';
+    ylim([50 ,100]);
+end
 
 
 % % %%
@@ -352,78 +355,81 @@ ylim([50 ,100]);
 
 fprintf('showing filters...\n');
 
-cmp=zeros(64,3);
-for I=1:32,
-    cmp(32+I,:)=[0,0,I/32];
-    cmp(I,:)=[1-I/32,0,0];
-    
+if DO_PLOT
+    cmp=zeros(64,3);
+    for I=1:32,
+        cmp(32+I,:)=[0,0,I/32];
+        cmp(I,:)=[1-I/32,0,0];
+        
+    end
+    for I=1:min(15,Ap),
+        figure(170+I);
+        %     subplot(4,4,I);
+        wf=linCoeffs;
+        %wf=nan(size(wf));wf(1:1000)=A(1:1000);wf(isnan(wf))=0;
+        
+        %     xlgnd=audio_cutoffs_Hz;
+        %     ylgnd=Hz_mod_cfreqs;
+        %     wfr=reshape(wf,[length(ylgnd),length(xlgnd)]);
+        
+        %     imagesc(xlgnd,ylgnd,wfr);axis xy;
+        
+        %     nori_log_imagesc(xlgnd,ylgnd,wfr,[])
+        data=nori_cell_array_unvectorize(wf,vecformat);is_colormap_negative=true;
+        clim=[-max(abs(wf)),max(abs(wf))];
+        %clim=[-1,1];
+        %clim=[];
+        %clim=[-5*sqrt(mean(wf.*wf)),5*sqrt(mean(wf.*wf))];
+        nori_figure_stat_summary_as_cell_array(data,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim)
+        
+        
+        
+        colormap(cmp)
+        xlabel(xlgnd_name);
+        ylabel(ylgnd_name);
+        %title(sprintf('%d',I));
+        
+    end
 end
-for I=1:min(15,Ap),
-    figure(170+I);
-    %     subplot(4,4,I);
-    wf=linCoeffs;
-    %wf=nan(size(wf));wf(1:1000)=A(1:1000);wf(isnan(wf))=0;
-    
-    %     xlgnd=audio_cutoffs_Hz;
-    %     ylgnd=Hz_mod_cfreqs;
-    %     wfr=reshape(wf,[length(ylgnd),length(xlgnd)]);
-    
-    %     imagesc(xlgnd,ylgnd,wfr);axis xy;
-    
-    %     nori_log_imagesc(xlgnd,ylgnd,wfr,[])
-    data=nori_cell_array_unvectorize(wf,vecformat);is_colormap_negative=true;
-         clim=[-max(abs(wf)),max(abs(wf))];
-    %clim=[-1,1];
-    %clim=[];
-    %clim=[-5*sqrt(mean(wf.*wf)),5*sqrt(mean(wf.*wf))];
-    nori_figure_stat_summary_as_cell_array(data,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim)
-    
-    
-    
+%%
+if DO_PLOT
+    figure(172);
+    dp=sqrt(2)*(mean(vals(labels==1,:))-mean(vals(labels~=1,:)))./(std(mean(vals(labels==1,:))) + std(mean(vals(labels~=1,:))));
+    dataDP=nori_cell_array_unvectorize(dp,vecformat);is_colormap_negative=true;
+    %     clim=[-max(abs(wf)),max(abs(wf))];
+    %     clim=[-3,3];
+    % clim=[];
+    clim=[-3*sqrt(mean(dp.*dp)),3*sqrt(mean(dp.*dp))];
+    nori_figure_stat_summary_as_cell_array(dataDP,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim)
     colormap(cmp)
-    xlabel(xlgnd_name);
-    ylabel(ylgnd_name);
-    %title(sprintf('%d',I));
-    
+    %xlabel(xlgnd_name);
+    %ylabel(ylgnd_name);
 end
 
 %%
-figure(172);
-dp=sqrt(2)*(mean(vals(labels==1,:))-mean(vals(labels~=1,:)))./(std(mean(vals(labels==1,:))) + std(mean(vals(labels~=1,:))));
-dataDP=nori_cell_array_unvectorize(dp,vecformat);is_colormap_negative=true;
-%     clim=[-max(abs(wf)),max(abs(wf))];
-%     clim=[-3,3];
-% clim=[];
-clim=[-3*sqrt(mean(dp.*dp)),3*sqrt(mean(dp.*dp))];
-nori_figure_stat_summary_as_cell_array(dataDP,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim)
-colormap(cmp)
-%xlabel(xlgnd_name);
-%ylabel(ylgnd_name);
-
-%%
-
-dp1= (mean(vals(labels==1,:)));
-dp2= (mean(vals(labels==2,:)));
-
-%     clim=[-max(abs(wf)),max(abs(wf))];
-%     clim=[-3,3];
-%clim=[];
-clim=[-3*sqrt(mean(dp1.*dp1)),3*sqrt(mean(dp1.*dp1))];
-figure(173);dataDP1=nori_cell_array_unvectorize(dp1,vecformat);is_colormap_negative=true;
-
-nori_figure_stat_summary_as_cell_array(dataDP1,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim);
-
-figure(174);dataDP2=nori_cell_array_unvectorize(dp2,vecformat);is_colormap_negative=true;
-nori_figure_stat_summary_as_cell_array(dataDP2,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim);
-
-
-figure(175);dataDP3=nori_cell_array_unvectorize(dp1-dp2,vecformat);is_colormap_negative=true;
-nori_figure_stat_summary_as_cell_array(dataDP3,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim);
-
-%colormap(cmp)
-%xlabel(xlgnd_name);
-%ylabel(ylgnd_name);
-
+if DO_PLOT
+    dp1= (mean(vals(labels==1,:)));
+    dp2= (mean(vals(labels==2,:)));
+    
+    %     clim=[-max(abs(wf)),max(abs(wf))];
+    %     clim=[-3,3];
+    %clim=[];
+    clim=[-3*sqrt(mean(dp1.*dp1)),3*sqrt(mean(dp1.*dp1))];
+    figure(173);dataDP1=nori_cell_array_unvectorize(dp1,vecformat);is_colormap_negative=true;
+    
+    nori_figure_stat_summary_as_cell_array(dataDP1,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim);
+    
+    figure(174);dataDP2=nori_cell_array_unvectorize(dp2,vecformat);is_colormap_negative=true;
+    nori_figure_stat_summary_as_cell_array(dataDP2,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim);
+    
+    
+    figure(175);dataDP3=nori_cell_array_unvectorize(dp1-dp2,vecformat);is_colormap_negative=true;
+    nori_figure_stat_summary_as_cell_array(dataDP3,xleg,yleg,xlabels,ylabels,titles,is_colormap_negative,clim);
+    
+    %colormap(cmp)
+    %xlabel(xlgnd_name);
+    %ylabel(ylgnd_name);
+end
 
 %%
 %title(sprintf('%d',I));
@@ -437,48 +443,49 @@ nori_figure_stat_summary_as_cell_array(dataDP3,xleg,yleg,xlabels,ylabels,titles,
 % axis([1 Ap 50 100]);
 % title('Labeling accuracy');
 % xlabel('Number of coefficents');
-
-figure(18);clf;
-subplot(2,2,1);
-ylabel('Accuracy (%%)');
-h=legend('cv-train','all-test','Location','NorthEastOutside');
-set(h,'FontSize',8);
-
-
-plot(acc*100,'kx-','LineWidth',2);hold on;
-plot([1 Ap],[accT,accT]*100,'gd--','LineWidth',2);hold on;
-
-
-% plot([15 15],[0,100],'r--','LineWidth',1);hold on;
-axis([0 2 50 100]);
-title(sprintf('Labeling accuracy %g %g',acc*100,accT*100));
-xlabel('Number of coefficents');
-
-
-ylabel('Accuracy (%%)');
-h=legend('cv-train','all-test','Location','SouthEast');
-set(h,'FontSize',8);
-
-
-subplot(2,2,2);
-scores=Xp*wf;
-scoresT=XpT*wf;
-
-
-
-plot([scores;scoresT]);hold on;
-plot(1:length([scores;scoresT]),0*([scores;scoresT]),'g-');
-pos=find((labels==1));
-plot(pos,mean(scores(pos))*ones(size(pos)),'m-');
-pos=find((labels~=1));
-plot(pos,mean(scores(pos))*ones(size(pos)),'m-');
-pos=find((labelsT==1));
-plot(length(scores)+pos,mean(scoresT(pos))*ones(size(pos)),'m-');
-pos=find((labelsT~=1));
-plot(length(scores)+pos,mean(scoresT(pos))*ones(size(pos)),'m-');%%
-fprintf('displaying raw data as a matrix...\n');
-
-figure(1);clf;imagesc([FEATURES{2};FEATURES{1}]);axis xy
+if DO_PLOT
+    figure(18);clf;
+    subplot(2,2,1);
+    ylabel('Accuracy (%%)');
+    h=legend('cv-train','all-test','Location','NorthEastOutside');
+    set(h,'FontSize',8);
+    
+    
+    plot(acc*100,'kx-','LineWidth',2);hold on;
+    plot([1 Ap],[accT,accT]*100,'gd--','LineWidth',2);hold on;
+    
+    
+    % plot([15 15],[0,100],'r--','LineWidth',1);hold on;
+    axis([0 2 50 100]);
+    title(sprintf('Labeling accuracy %g %g',acc*100,accT*100));
+    xlabel('Number of coefficents');
+    
+    
+    ylabel('Accuracy (%%)');
+    h=legend('cv-train','all-test','Location','SouthEast');
+    set(h,'FontSize',8);
+    
+    
+    subplot(2,2,2);
+    scores=Xp*wf;
+    scoresT=XpT*wf;
+    
+    
+    
+    plot([scores;scoresT]);hold on;
+    plot(1:length([scores;scoresT]),0*([scores;scoresT]),'g-');
+    pos=find((labels==1));
+    plot(pos,mean(scores(pos))*ones(size(pos)),'m-');
+    pos=find((labels~=1));
+    plot(pos,mean(scores(pos))*ones(size(pos)),'m-');
+    pos=find((labelsT==1));
+    plot(length(scores)+pos,mean(scoresT(pos))*ones(size(pos)),'m-');
+    pos=find((labelsT~=1));
+    plot(length(scores)+pos,mean(scoresT(pos))*ones(size(pos)),'m-');%%
+    fprintf('displaying raw data as a matrix...\n');
+    
+    figure(1);clf;imagesc([FEATURES{2};FEATURES{1}]);axis xy
+end
 %%
 
 if DO_EXMP
