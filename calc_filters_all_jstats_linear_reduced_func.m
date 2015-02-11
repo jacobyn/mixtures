@@ -1,4 +1,6 @@
 function calc_filters_all_jstats_linear_reduced_func(LN_SELECT,moutfname)
+LN_SELECT
+moutfname
 % assert(1==0);
 %clear all;close all;clc;
 %close all
