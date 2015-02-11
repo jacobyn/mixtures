@@ -252,13 +252,15 @@ ypT=labelsT*2-3;
 Mdl = fitcdiscr(vals,labels,'SaveMemory','on','FillCoeffs','off');
 
 [err,gamma,delta,numpred] = cvshrink(Mdl,'NumGamma',29,'NumDelta',29,'Verbose',2);
+%%
 minerr = min(min(err));
 NN=size(vals,2);
-FEATNUM=sort([FEATNUM,NN*0.1,NN*0.2,NN*0.3,NN*0.4,NN*0.5,NN*0.7,NN*0.9,NN*1]);
+FEATNUM=sort([FEATNUM,NN*0.1,NN*0.2,NN*0.3,NN*0.4,NN*0.5,NN*0.7,NN*0.9,NN*1.1,inf]);
 ps=nan(size(FEATNUM));
 qs=nan(size(FEATNUM));
 
-for K=1:FEATNUM,
+for K=1:length(FEATNUM),
+    NUM_COEF=FEATNUM(K);
     low_limit = min(min(err(numpred <= NUM_COEF)));
     [mp,mq] = find(err == low_limit,1);
     ps(K)=mp;
@@ -269,6 +271,9 @@ temp=unique([ps;qs]','rows');temp=temp(~isnan(temp(:,1)),:);
 ps=temp(:,1);
 qs=temp(:,2);
 
+%%
+accTs=nan(size(length(ps)));
+accs=nan(size(length(ps)));
 
 for K=1:length(ps),
     p=ps(K);
@@ -291,17 +296,25 @@ for K=1:length(ps),
     tic
     [prdcT,scoreT] = predict(obj,valsT);
     accT=sum(prdcT==labelsT)/length(labelsT);
+    accs(K)=acc;
+    accTs(K)=accT;
     toc
     fprintf('RESULTS acc on train %g acc on test %g my_num %g myperr %g mygamma %g mydelta %g| %s |%s \n',acc,accT,mynum,myperr,mygamma,mydelta,sprintf('%d ',LN_SELECT),fname);
 end
 
 %%
 if DO_PLOT
-    figure (30);
+    figure (30);clf
     indx = repmat(1:size(delta,2),size(delta,1),1);
     subplot(2,2,1)
     imagesc(err);hold on;
-    plot(p,q,'ro','MarkerFaceColor','k');
+    for K=1:length(ps),
+        p=ps(K);
+        q=qs(K);
+        plot(p,q,'ro','MarkerFaceColor','k');
+    end
+    
+    
     colorbar;
     colormap('jet')
     title 'Classification error';
@@ -309,22 +322,34 @@ if DO_PLOT
     ylabel 'Gamma index';
     
     subplot(2,2,2)
-    imagesc(numpred);hold on;
-    plot(p,q,'ro','MarkerFaceColor','k');
+    imagesc(log2(numpred));hold on;
+    for K=1:length(ps),
+        p=ps(K);
+        q=qs(K);
+        plot(p,q,'ro','MarkerFaceColor','k');
+    end
+    
     colorbar;
-    title 'Number of predictors in the model';
+    title 'log2 of Number of predictors in the model';
     xlabel 'Delta index' ;
     ylabel 'Gamma index' ;
     
     subplot(2,2,3);
     plot(err,numpred,'k.');hold on;
-    plot(err(p,q),numpred(p,q),'ro');
+    for K=1:length(ps),
+        p=ps(K);
+        q=qs(K);
+        
+        plot(err(p,q),numpred(p,q),'ro');
+    end
     
     xlabel('Error rate');
     ylabel('Number of predictors');
     subplot(2,2,4);
-    b=bar([acc,accT]*100);b(1).FaceColor='blue';
+    b=bar([accs;accTs]'*100);b(1).FaceColor='blue';
     ylim([50 ,100]);
+    legend('train','test');
+    set(gca,'XtickLabel',diag(numpred(ps,qs)));
 end
 
 
