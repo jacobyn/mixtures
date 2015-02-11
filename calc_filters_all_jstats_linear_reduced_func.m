@@ -4,6 +4,7 @@ function calc_filters_all_jstats_linear_reduced_func(LN_SELECT,moutfname)
 %close all
 %rng(8000,'twister') % For reproducibility
 
+FEATNUM=[10,20,30,50,100,200,500,1000];
 DO_PLOT=false;
 DO_EXMP=false;
 fprintf('reading and formatting data...\n');
@@ -40,7 +41,9 @@ tic
 %load('FEATURES-cello-10k.mat');
 %%%%%load('~/data/mixture-res/FEATURES-timit-jstat-RMS15-10k.mat');
 %load('~/data/mixture-res/FEATURES-timit-jstat-fail80-10kb.mat');
-load('~/data/mixture-res/FEATURES-timit-jstat-25db.mat');
+fname='~/data/mixture-res/FEATURES-timit-jstat-25db.mat';
+
+load(fname);
 toc
 fprintf('formatting...\n');
 tic
@@ -250,29 +253,47 @@ Mdl = fitcdiscr(vals,labels,'SaveMemory','on','FillCoeffs','off');
 
 [err,gamma,delta,numpred] = cvshrink(Mdl,'NumGamma',29,'NumDelta',29,'Verbose',2);
 minerr = min(min(err));
+NN=size(vals,2);
+FEATNUM=sort([FEATNUM,NN*0.1,NN*0.2,NN*0.3,NN*0.4,NN*0.5,NN*0.7,NN*0.9,NN*1]);
+ps=nan(size(FEATNUM));
+qs=nan(size(FEATNUM));
 
-NUM_COEF=round(.3*size(vals,2))
-low_limit = min(min(err(numpred <= NUM_COEF)));
-[p,q] = find(err == low_limit,1);
+for K=1:FEATNUM,
+    low_limit = min(min(err(numpred <= NUM_COEF)));
+    [mp,mq] = find(err == low_limit,1);
+    ps(K)=mp;
+    qs(K)=mq;
+end
 
-%[p,q] = find(err == minerr,1);
-mygamma= gamma(p);
-mydelta=delta(p,q);
-obj = fitcdiscr(vals,labels,'SaveMemory','on','FillCoeffs','on','Gamma',mygamma,'delta',mydelta);
-fprintf('best gamma %3.3g best delta %3.3g err %3.3g\n',mygamma,mydelta,minerr);
+temp=unique([ps;qs]','rows');temp=temp(~isnan(temp(:,1)),:);
+ps=temp(:,1);
+qs=temp(:,2);
 
-fprintf('predict on train set...\n');
-tic
-[prdc,score] = predict(obj,vals);
-linCoeffs=obj.Coeffs(2,1).Linear;
-acc=sum(prdc==labels)/length(labels);
-toc;
-fprintf('predict on test set...\n');
-tic
-[prdcT,scoreT] = predict(obj,valsT);
-accT=sum(prdcT==labelsT)/length(labelsT);
-toc
-fprintf('acc on train %g acc on test %g\n',acc,accT);
+
+for K=1:length(ps),
+    p=ps(K);
+    q=qs(K);
+    %[p,q] = find(err == minerr,1);
+    mynum=numpred(p,q);
+    myperr=err(p,q);
+    mygamma= gamma(p);
+    mydelta=delta(p,q);
+    obj = fitcdiscr(vals,labels,'SaveMemory','on','FillCoeffs','on','Gamma',mygamma,'delta',mydelta);
+    %fprintf('best gamma %3.3g best delta %3.3g err %3.3g\n',mygamma,mydelta,minerr);
+    
+    fprintf('predict on train set...\n');
+    tic
+    [prdc,score] = predict(obj,vals);
+    linCoeffs=obj.Coeffs(2,1).Linear;
+    acc=sum(prdc==labels)/length(labels);
+    toc;
+    fprintf('predict on test set...\n');
+    tic
+    [prdcT,scoreT] = predict(obj,valsT);
+    accT=sum(prdcT==labelsT)/length(labelsT);
+    toc
+    fprintf('RESULTS acc on train %g acc on test %g my_num %g myperr %g mygamma %g mydelta %g| %s |%s \n',acc,accT,mynum,myperr,mygamma,mydelta,sprintf('%d ',LN_SELECT),fname);
+end
 
 %%
 if DO_PLOT
