@@ -89,6 +89,7 @@ INFOab{2}=INFO{B};
 % 10 Mod C1 (25.0 Hz) 	 start 5217 end 6241
 % 11 Mod C1 (50.0 Hz) 	 start 6241 end 7265
 % 12 Mod C1 (100.0 Hz) 	 start 7265 end 8289
+
 LNA=1;LNB=8288;
 LN_ALL=zeros(8288,1);
 LN_ALL(1:32)=1;
@@ -301,7 +302,7 @@ for K=1:length(ps),
     accs(K)=acc;
     accTs(K)=accT;
     toc
-    fprintf('RESULTS acc on train %g acc on test %g my_num %g myperr %g mygamma %g mydelta %g| %s |%s \n',acc,accT,mynum,myperr,mygamma,mydelta,sprintf('%d ',LN_SELECT),fname);
+    fprintf('RESULTS acc on train %g acc on test %g my_num %g myperr %g mygamma %g mydelta %g| %s |%s \n',acc,accT,mynum,myperr,mygamma,mydelta,str,fname);
 end
 
 %%
