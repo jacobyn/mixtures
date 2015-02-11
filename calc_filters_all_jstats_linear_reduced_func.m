@@ -5,7 +5,7 @@ for I=1:length(LN_SELECTs)
     LN_SELECT(I)=str2num(LN_SELECTs{I});
 end
 %%
-moutfname=['LIN-job-',str,'.mat']
+moutfname=['~/data/LIN-job-',str,'.mat']
 % assert(1==0);
 %clear all;close all;clc;
 %close all
