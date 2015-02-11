@@ -1,6 +1,6 @@
-function calc_filters_all_jstats_linear_reduced_func(LN_SELECT,moutfname)
-LN_SELECT
-moutfname
+function calc_filters_all_jstats_linear_reduced_func(str)
+LN_SELECT=strsplit(str,'-')
+moutfname=['LIN-job-',str,'.mat']
 % assert(1==0);
 %clear all;close all;clc;
 %close all
