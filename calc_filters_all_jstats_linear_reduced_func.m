@@ -1,5 +1,10 @@
 function calc_filters_all_jstats_linear_reduced_func(str)
-LN_SELECT=strsplit(str,'-')
+LN_SELECTs=strsplit(str,'-');
+LN_SELECT=nan(size(LN_SELECTs));
+for I=1:length(LN_SELECTs)
+    LN_SELECT(I)=str2num(LN_SELECTs{I});
+end
+%%
 moutfname=['LIN-job-',str,'.mat']
 % assert(1==0);
 %clear all;close all;clc;
