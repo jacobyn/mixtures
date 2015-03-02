@@ -1,8 +1,8 @@
 % assert(1==0);
 clear all;close all;clc;
 disp(sprintf('reading and formatting data...'));
-% load('FEATURES-N-v4.mat'); 
-load('FEATURES-NI-v1.mat');
+ load('FEATURES-N-v4.mat'); 
+%load('FEATURES-NI-v1.mat');
 Nab=2;
 FEATURESab=cell(Nab,1);
 A=1;B=2;
@@ -24,6 +24,7 @@ for I=1:Nab
     labels=[labels;ones(size(FEATURESab{I}(1:NTRAIN,:),1),1)*I];
     
 end
+%labels=randn(size(labels))>0;%%%%NOTE TNOETE TNEOTE!!!!
 
 info=cell(length(labels),1);cnt=0;
 for I=1:Nab

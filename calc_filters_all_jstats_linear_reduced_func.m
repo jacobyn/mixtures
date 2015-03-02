@@ -159,24 +159,28 @@ for I=1:Nab
             
             
             
-            xleg=INFOab{I}{J}.jstats.xleg;
-            yleg=INFOab{I}{J}.jstats.yleg;
-            xlabels=INFOab{I}{J}.jstats.xlabels;
-            ylabels=INFOab{I}{J}.jstats.ylabels;
-            titles=INFOab{I}{J}.jstats.titles;
+            oxleg=INFOab{I}{J}.jstats.xleg;
+            oyleg=INFOab{I}{J}.jstats.yleg;
+            oxlabels=INFOab{I}{J}.jstats.xlabels;
+            oylabels=INFOab{I}{J}.jstats.ylabels;
+            otitles=INFOab{I}{J}.jstats.titles;
             
             ovecformat=vecformat;
-            oxlabels=xlabels;
-            oylabels=ylabels;
-            otitles=titles;
+            
             vecformat=cell(length(LN_SELECT),1);
             xlabels=cell(length(LN_SELECT),1);
             ylabels=cell(length(LN_SELECT),1);
+            xleg=cell(length(LN_SELECT),1);
+            yleg=cell(length(LN_SELECT),1);
+            titles=cell(length(LN_SELECT),1);
             for K=1:length(LN_SELECT),
                 vecformat{K}=ovecformat{LN_SELECT(K)};
                 xlabels{K}=oxlabels{LN_SELECT(K)};
                 ylabels{K}=oylabels{LN_SELECT(K)};
                 titles{K}=otitles{LN_SELECT(K)};
+                xleg{K}=oxleg{LN_SELECT(K)};
+                yleg{K}=oyleg{LN_SELECT(K)};
+                
                 
             end
         end
@@ -259,7 +263,7 @@ ypT=labelsT*2-3;
 % obj = fitcdiscr(vals,labels);
 Mdl = fitcdiscr(vals,labels,'SaveMemory','on','FillCoeffs','off');
 
-[err,gamma,delta,numpred] = cvshrink(Mdl,'NumGamma',29,'NumDelta',29,'Verbose',2);
+[err,gamma,delta,numpred] = cvshrink(Mdl,'NumGamma',29,'NumDelta',29,'Verbose',1);
 %%
 minerr = min(min(err));
 NN=size(vals,2);

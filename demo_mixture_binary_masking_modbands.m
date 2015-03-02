@@ -21,8 +21,6 @@ DATA=cell(ITER,1);
 cnt=0;
 for mm=1:length(Ms),
     M=Ms(mm);
-    
-    
     for KK=1:ITER,
         
         display(sprintf('now in file %d of %d\t M=%d',KK,ITER,M));
@@ -44,8 +42,7 @@ for mm=1:length(Ms),
             
             [Y, FS]=audioread(fname,myrange);
             
-            %         [Y,FS,NBITS,CHUNKDATA] = aiffread(fname,[BEG*44100,(BEG+1)*44100]);%             [Y,FS,NBITS,CHUNKDATA] = aiffread(fname);
-            
+          
             %assert(FS==44100);
             Y=double(Y);
             Y=0.03*(Y/sqrt(mean((Y.^2))));
@@ -95,7 +92,7 @@ for mm=1:length(Ms),
         DATA{cnt}.mixture=myCgrmM;
         assert(numel(DATA{cnt}.y1)==numel(DATA{cnt}.y2));assert(numel(DATA{cnt}.y1)==numel(DATA{cnt}.mask));assert(numel(DATA{cnt}.mask)==numel(DATA{cnt}.mixture));
         
-    
+        temp5;
         
         figure(1);
         subplot(3,2,1);imagesc(log(myCgrmM.^2)');axis xy;title('mixture');

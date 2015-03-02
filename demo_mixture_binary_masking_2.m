@@ -1,5 +1,5 @@
 clear all;close all;clc;
-ITER=1; % number of random
+ITER=10; % number of random
 Ms=[2]; %all possible number of speakers
 %addpath('C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures');
 addpath('~/ResearchMIT/mixtures/');
@@ -81,8 +81,18 @@ for mm=1:length(Ms),
         
         maskM=(temp_1)<(10^(MYRMS/20))*(temp_2);
         %maskM=(myCgrm{1}.^2)<((myCgrm{2}.^2));
-        Y1=collapse_subbands(myCgrmM.*(maskM==0),FilterBank);
-        Y2=collapse_subbands(myCgrmM.*(maskM==1),FilterBank);
+        if KK>1
+            mask_old2=maskM;
+            maskM=mask_old;
+            mask_old=mask_old2;
+        else
+            mask_old=maskM;
+        end
+        maskM=double(maskM);
+        %maskM=conv2(double(maskM),ones(2)/4,'same');
+        Y1=collapse_subbands(myCgrmM.*(maskM),FilterBank);
+        Y2=collapse_subbands(myCgrmM.*(1-maskM),FilterBank);
+        
         
         Y1=0.03*Y1/rms(Y1);
         Y2=0.03*Y2/rms(Y2);
@@ -103,8 +113,8 @@ for mm=1:length(Ms),
         subplot(3,2,3);imagesc(log(myCgrm{1}.^2)');axis xy; title('original 1');
         subplot(3,2,4);imagesc(log(myCgrm{2}.^2)');axis xy; title('original 2');
         
-        subplot(3,2,5);imagesc(log((myCgrm{1}.*(maskM==0)).^2 )');axis xy;title('masked mixture 1');
-        subplot(3,2,6);imagesc(log((myCgrm{2}.*(maskM==1)).^2 )');axis xy;title('masked mixture 2');
+        subplot(3,2,5);imagesc(log((myCgrm{1}.*(maskM)).^2 )');axis xy;title('masked mixture 1');
+        subplot(3,2,6);imagesc(log((myCgrm{2}.*(1-maskM)).^2 )');axis xy;title('masked mixture 2');
        
         p = audioplayer(soundM, FS);p.play
         pause(1.5*length(soundM)/FS +0.5);
