@@ -36,13 +36,13 @@ for mm=1:length(Ms),
             info=audioinfo(fname);
             smpls=info.TotalSamples;
             fs=info.SampleRate;
-           assert(smpls-fs*DUR>0);
+            assert(smpls-fs*DUR>0);
             mypos=randi(smpls-fs*DUR,1,1);
             myrange=[mypos, mypos+fs*DUR];
             
             [Y, FS]=audioread(fname,myrange);
             
-          
+            
             %assert(FS==44100);
             Y=double(Y);
             Y=0.03*(Y/sqrt(mean((Y.^2))));
@@ -91,9 +91,17 @@ for mm=1:length(Ms),
         DATA{cnt}.mask=maskM;
         DATA{cnt}.mixture=myCgrmM;
         assert(numel(DATA{cnt}.y1)==numel(DATA{cnt}.y2));assert(numel(DATA{cnt}.y1)==numel(DATA{cnt}.mask));assert(numel(DATA{cnt}.mask)==numel(DATA{cnt}.mixture));
+           
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%
+        demo_modband_apply_mask;
         
-        temp5;
-        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%
         figure(1);
         subplot(3,2,1);imagesc(log(myCgrmM.^2)');axis xy;title('mixture');
         subplot(3,2,2);imagesc(maskM');axis xy; title('mask');
@@ -102,7 +110,7 @@ for mm=1:length(Ms),
         
         subplot(3,2,5);imagesc(log((myCgrm{1}.*(maskM==0)).^2 )');axis xy;title('masked mixture 1');
         subplot(3,2,6);imagesc(log((myCgrm{2}.*(maskM==1)).^2 )');axis xy;title('masked mixture 2');
-       
+        
         p = audioplayer(soundM, FS);p.play
         pause(1.5*length(soundM)/FS +0.5);
         %          p = audioplayer(mixme{1}, FS);p.play
@@ -116,13 +124,13 @@ for mm=1:length(Ms),
         pause(1.1*length(Y2)/FS+ 0.5);
         
         
-       cd (output_data);
-       
+        cd (output_data);
+        
         audiowrite('talk.wav',mixme{1},FS);
         audiowrite('seperated-1.wav',Y1,FS);
         audiowrite('seperated-2.wav',Y2,FS);
         audiowrite('seperated-1.wav',Y1,FS);
-     
+        
         
     end
 end

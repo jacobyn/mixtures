@@ -32,7 +32,8 @@ tic
 %load('FEATURES-timit-norm-10k.mat');
 %load('~/data/mixture-res/FEATURES-timit-env-mean.mat');
 %%%%%load('~/data/mixture-res/FEATURES-timit-modpower-RMS15.mat')
-load('~/data/mixture-res/FEATURES-timit-modpower-RMS15b.mat');
+%load('~/data/mixture-res/FEATURES-timit-modpower-RMS15b.mat');
+load('FEATURES-timit-mask-mix-01.mat');
 
 %load('FEATURES-cello-10k.mat');
 toc

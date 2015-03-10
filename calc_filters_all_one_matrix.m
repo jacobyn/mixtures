@@ -8,7 +8,10 @@ fprintf('reading and formatting data...\n');
 
 tic
 %load('~/data/mixture-res/FEATURES-timit-modpower-25.mat');
-load('~/data/mixture-res/FEATURES-timit-envC-25.mat');
+%load('~/data/mixture-res/FEATURES-timit-envC-25.mat');
+load('~/data/mixture-res/FEATURES-timit-mask-mix-01.mat');
+output_audiodata='~/data/mixture-temp2';
+
 toc
 fprintf('formatting...\n');
 tic
@@ -319,7 +322,7 @@ end
 %%
 if DO_EXMP
     fprintf('concatenating typical audio examples...\n');
-    
+    cd (output_audiodata)
     figure(2);clf;
     
     hold on;
@@ -364,23 +367,26 @@ if DO_EXMP
                 myrng=info{idx(J)}.range;
                 
                 
-                Y=info{idx(J)}.audio;
-                fs=info{idx(J)}.fs;
+%                 Y=info{idx(J)}.audio;
+%                 fs=info{idx(J)}.fs;
+%                 
+                [Y,fs]=wavread(info{idx(J)}.fname,info{idx(J)}.range);
                 
                 
                 Yh=Y;
                 playmeold=playme;
                 playme=[playme;Yh];
-                
+                 
             end
         end
         
         
         drawnow;
         
-        ofname=sprintf('NLIN-10ktimi15k-onematirx-%d.direc-%d.wav',I1,k);
+        ofname=sprintf('NGENS-%d.direc-%d.wav',I1,k);
+        nori_doplay(playme,fs);
         
-        audiowrite(ofname,playme,fs)
+        %audiowrite(ofname,playme,fs)
         pause(0.8*length(playme)/fs);
          pause(2);
     end
