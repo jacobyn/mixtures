@@ -103,7 +103,7 @@ for mm=1:2,
                     smpls=info.TotalSamples;
                     fs=info.SampleRate;
                     if (smpls-fs*DUR)<0
-                        fprintf(' too short (%g sec)\n', tsmpls/tfs)
+                        fprintf('...too short \n')
                     end
                     
                 end
