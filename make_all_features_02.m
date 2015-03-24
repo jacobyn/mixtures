@@ -1,6 +1,6 @@
 %matlabpoolv
-%clear all;close all;clc;
-ITER=2000; % number of random
+clear all;close all;clc;
+ITER=100; % number of random
 
 
 addpath(genpath('~/toolboxes/'))
@@ -13,18 +13,19 @@ else
 end
 base_ptrn='s*.wav';
 
-%feature_fname='~/data/mixture-res/FEATURES-timit-mask-mix-WHATTYPE-A-1.mat';
+feature_fname='~/data/mixture-res/FEATURES-timit-mask-mix-SPEC-WHATTYPE-1-100.mat';
 
 MYRMS=0; % rms of the mixture!!! important
 %MYRMS=80; % rms of the mixture!!! important
 is_sound=false;
 is_show_snap=false; %for debuging showing snapshots
+is_save_sound_with_features=true; %saving the real audio
 
 %WHATTYPE=1; %normal mix
-%WHATTYPE=2; %ideal mask mix vs previous mix
+WHATTYPE=2; %ideal mask mix vs previous mix
 %WHATTYPE=3; %ideal mask mix vs smooth gaussian mix
 
-if WHATTYPE==1
+if WHATTYPE==1  
     IS_STAY_MASK=false;
     IS_NORM_MIX=true;
 elseif WHATTYPE==2
@@ -44,9 +45,10 @@ FEATURES=cell(MN,1);
 INFO=cell(MN,1);
 
 FS0=16000;
-DUR=1.0; %sec
+DUR=1; %sec
 M=2;
 
+%NFEAT=1280;  % for 40*32 100 msec env subbands
 NFEAT=640;  % for modpower
 % NFEAT=1024;   %for C1 and C
 % NFEAT=32*6*2; % for C2 (384)
@@ -103,7 +105,7 @@ for mm=1:2,
                     smpls=info.TotalSamples;
                     fs=info.SampleRate;
                     if (smpls-fs*DUR)<0
-                        fprintf('too short \n')
+                        fprintf('...too short \n')
                     end
                     
                 end
@@ -160,6 +162,7 @@ for mm=1:2,
                 S1 = nori_generate_fqsubands(mixme{1}, FS0);
                 S2 = nori_generate_fqsubands(mixme{2}, FS0);
                 maskM=S1.subband_envs>S2.subband_envs;
+                %maskM=20*log10(S1.subband_envs)>-15;
             end
             
             if (mm==2) && IS_STAY_MASK
@@ -211,7 +214,7 @@ for mm=1:2,
             myfs=FS0;
         end
         
-        % audiowrite(mfname,collapse_sound_1,FS0)
+        
         
          
             
@@ -228,6 +231,17 @@ for mm=1:2,
         myINFO{KK,1}.xlgnd_name='mod-fq(Hz)';
         myINFO{KK,1}.ylgnd_name='fq(Hz)';
         
+%         
+%         S = nori_generate_modsubands(myts, myfs);
+%         
+%         mymat=S.subband_envs';
+%         feature=reshape(mymat,[1 numel(S.subband_envs)]); % rehshape stats
+%         myINFO{KK,1}.xlgnd=1000*(1:size(mymat,2))/myfs;
+%         myINFO{KK,1}.ylgnd=S.audio_cutoffs_Hz;
+%         myINFO{KK,1}.xlgnd_name='tims(msec)';
+%         myINFO{KK,1}.ylgnd_name='fq(Hz)';
+%         
+        
         
         
         
@@ -242,12 +256,14 @@ for mm=1:2,
         
         
         %myINFO{KK,1}.fname=mfname;
-        myINFO{KK,1}.range=[min(tt3),max(tt3)];
-        myINFO{KK,1}.Hz_mod_cfreqs=S.Hz_mod_cfreqs;
-        myINFO{KK,1}.audio_cutoffs_Hz=S.audio_cutoffs_Hz;
+        %myINFO{KK,1}.range=[min(tt3),max(tt3)];
+        %myINFO{KK,1}.Hz_mod_cfreqs=S.Hz_mod_cfreqs;
+        %myINFO{KK,1}.audio_cutoffs_Hz=S.audio_cutoffs_Hz;
         
-        %myINFO{KK,1}.audio=myts;
-        %myINFO{KK,1}.fs=myfs;
+        if is_save_sound_with_features
+         myINFO{KK,1}.audio=myts;
+         myINFO{KK,1}.fs=myfs;
+        end
         
         %downsampling
         %myINFO{KK,1}.audio=resample(myts,round(myfs/10),myfs);
@@ -259,9 +275,14 @@ for mm=1:2,
                 
                
                 figure(10);clf;
-                imagesc(S.Hz_mod_cfreqs,S.audio_cutoffs_Hz, S.mod_power);axis xy;
-                drawnow
+                %imagesc(S.Hz_mod_cfreqs,S.audio_cutoffs_Hz, S.mod_power);
+                %clim=[min(min(S.mod_power)),max(max(S.mod_power))];
+                %h=nori_log_imagesc(S.Hz_mod_cfreqs,S.audio_cutoffs_Hz, S.mod_power,clim,[]);axis xy;
+                imagesc(1:32,(1:size(S.subband_envs,1))/S.env_sr, S.subband_envs');axis xy;
                 
+                drawnow
+                %pause
+                % audiowrite('MAR15_example1.wav',myts/max(myts),FS);
          end
         
     end

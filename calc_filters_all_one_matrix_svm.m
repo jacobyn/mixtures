@@ -5,7 +5,7 @@
 
 DO_EXMP=true;
 fprintf('reading and formatting data...\n');
-
+%addpath('/Users/jacoby/Dropbox (PPCA)/Research MIT/toolboxes/libsvm2');
 tic
 %load('~/data/mixture-res/FEATURES-timit-modpower-25.mat');
 %load('~/data/mixture-res/FEATURES-timit-envC-25.mat');
@@ -52,11 +52,12 @@ INFOab{2}=INFO{B};
 % 12 Mod C1 (100.0 Hz) 	 start 7265 end 8289
 
 
-if ispc()
+if ismac()
     % addpath('C:\Users\user\Dropbox (PPCA)\Research MIT\mixtures\libsvm');
-    addpath(genpath('C:\Users\user\Dropbox (PPCA)\Research MIT\toolboxes'));
-elseif ismac()
     addpath(genpath('~/ResearchMIT/toolboxes/'))
+   
+elseif isunix() 
+     addpath(genpath('C:\Users\user\Dropbox (PPCA)\Research MIT\toolboxes'));
     
 end
 
@@ -114,7 +115,7 @@ end
 assert(length(labels)==length(info));
 toc
 
-%%
+
 valsN=vals;
 %*****
 %vals=20*log10(vals);%LLLLOG NOTE NTOE NTOENTOETNOENTOETNOETNOENTOETNO
@@ -147,6 +148,30 @@ for I=1:Nab
 end
 assert(length(labelsT)==length(infoT));
 
+
+
+%%
+
+% 
+% logcs=-1:1:3;
+% %logcs=0;
+% log2g=inf;bestg=inf;
+% mygrid=nan(length(logcs),1);
+% bestcv = 0;
+% for I=1:length(logcs),
+%     display(sprintf('I=%d of %d',I,length(logcs)));
+%     log2c=logcs(I);
+%     
+%     %     cmd = ['-v 5 -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
+%     cmd = ['-v 5 -c ', num2str(2^log2c), ' -t 0 '];
+%     cv = lsvmtrain(labels, vals, cmd);
+%     if (cv >= bestcv),
+%         bestcv = cv; bestc = 2^log2c;
+%     end
+%     mygrid(I)=cv;
+%     fprintf('%g %g %g (best c=%g, g=%g, rate=%g)\n', log2c, log2g, cv, bestc, bestg, bestcv);
+% end
+% figure(10);plot(logcs,mygrid)
 
 
 %%

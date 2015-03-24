@@ -12,7 +12,7 @@ for J=1:size(mmask,1)
         nmask(J,:,I)=resample(myw(:),S0.P.env_sr,S0.P.mod_env_sr);
     end
 end
-%%
+
 %mask=resample(double(mask),S0.P.env_sr,S0.P.mod_env_sr);
 
 %mask=S1.all_mod_subbands_envs>S2.all_mod_subbands_envs;
@@ -61,7 +61,7 @@ collapse_sound_2=collapse_subbands(collapse_subbands_2,S0.audio_filts);
         
         p2 = audioplayer(soundM/max(soundM), FS);p2.play
         pause(1.1*length(soundM)/FS +0.5);
-    %%    
+       
 %  
 %  figure(11);clf;    
 %  for j=1:size(S1.audio_filts,2) %go through subbands
@@ -75,7 +75,7 @@ collapse_sound_2=collapse_subbands(collapse_subbands_2,S0.audio_filts);
 %      imagesc(log2(abs(reshape(S2.all_mod_subbands(j,2:end,2:end),size(S2.all_mod_subbands,2)-1,size(S2.all_mod_subbands,3)-1)))')
 %  end
 %    
-  %%
+ 
  figure(13);clf;    
  for j=1:min(size(S1.audio_filts,2),4) %go through subbands
      subplot(2,2,j);
@@ -117,7 +117,7 @@ collapse_sound_2=collapse_subbands(collapse_subbands_2,S0.audio_filts);
         %p2 = audioplayer(soundM/max(soundM), FS);p2.play
         %pause(1.1*length(soundM)/FS +0.5);
   
-        %%
+        
   figure(13);      
   for j=1:min(size(S1.audio_filts,2),4) %go through subbands
     subplot(2,2,j);

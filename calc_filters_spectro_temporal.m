@@ -31,7 +31,7 @@ for I=1:Nab
     labelsT=[labelsT;ones(size(FEATURESab{I}((NTRAIN+1):end,:),1),1)*I];
 end
 
-
+%%
 %  logcs=-1:1:3;
   logcs=0;
 log2g=inf;bestg=inf;
