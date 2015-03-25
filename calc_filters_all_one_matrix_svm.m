@@ -57,7 +57,7 @@ if ismac()
     addpath(genpath('~/ResearchMIT/toolboxes/'))
    
 elseif isunix() 
-     addpath(genpath('C:\Users\user\Dropbox (PPCA)\Research MIT\toolboxes'));
+     addpath(genpath('~/toolboxes/'));
     
 end
 
